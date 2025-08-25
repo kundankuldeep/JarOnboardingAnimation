@@ -15,6 +15,6 @@ class OnboardingViewModel @Inject constructor() : ViewModel() {
 }
 
 data class OnboardingUiState(
-    val screenText: String = "This is onboarding",
-    val buttonText: String = "Get Started"
+    val isLoading: Boolean = false
+    // Add future state properties here  
 )

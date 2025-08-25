@@ -10,17 +10,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.app.jaronboardinganimation.R
 import com.app.jaronboardinganimation.ui.theme.JarOnboardingAnimationTheme
 
 @Composable
 fun DashboardScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    // val uiState by viewModel.uiState.collectAsState() // For future use
     
     Box(
         modifier = Modifier
@@ -29,7 +31,7 @@ fun DashboardScreen(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = uiState.screenText,
+            text = stringResource(R.string.dashboard_title),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center
         )
@@ -48,7 +50,7 @@ fun DashboardScreenPreview() {
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "This is landing",
+                text = stringResource(R.string.dashboard_title),
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center
             )

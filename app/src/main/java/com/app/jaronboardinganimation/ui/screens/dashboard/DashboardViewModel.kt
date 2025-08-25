@@ -15,5 +15,6 @@ class DashboardViewModel @Inject constructor() : ViewModel() {
 }
 
 data class DashboardUiState(
-    val screenText: String = "Landing page"
+    val isLoading: Boolean = false
+    // Add future state properties here
 )

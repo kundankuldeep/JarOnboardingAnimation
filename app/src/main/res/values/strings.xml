@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Jar Onboarding Animation</string>
+    
+    <!-- Onboarding Screen -->
+    <string name="onboarding_title">This is onboarding</string>
+    <string name="onboarding_button">Get Started</string>
+    
+    <!-- Dashboard Screen -->
+    <string name="dashboard_title">Landing page</string>
 </resources>
