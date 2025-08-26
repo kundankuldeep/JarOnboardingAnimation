@@ -77,7 +77,7 @@ class OnboardingViewModel @Inject constructor(
                 }
                 
                 if (validCards.isNotEmpty()) {
-                    // Initialize all cards as hidden initially
+                    // Initialize all cards as hidden initially - they'll slide in from bottom
                     val cardStates = validCards.map { CardState.HIDDEN }
                     
                     _uiState.value = _uiState.value.copy(
@@ -89,7 +89,7 @@ class OnboardingViewModel @Inject constructor(
                         isUserInteractionEnabled = false
                     )
                     
-                    // Start card animation sequence
+                    // Start card animation sequence - all cards will slide in from bottom
                     startCardAnimationSequence()
                 } else {
                     // No valid cards, show fallback
@@ -121,56 +121,51 @@ class OnboardingViewModel @Inject constructor(
             // Initial 200ms delay before first card appears
             delay(200)
             
+            // Simple sequential animation: each card slides in, collapses to position, next card comes
+            
             for (cardIndex in 0 until cardCount) {
-                // Update current card index and background color
+                // Update current card and background
                 _uiState.value = _uiState.value.copy(
                     currentCardIndex = cardIndex,
-                    currentBackgroundColor = parseColor(educationData.educationCardList[cardIndex].backgroundColor)
+                    currentBackgroundColor = parseColor(educationData.educationCardList[cardIndex].backgroundColor),
+                    animationPhase = AnimationPhase.CARD_SLIDING_UP
                 )
                 
-                // Phase 1: Card slides up from bottom to center (PEEKING → EXPANDED)
-                val newCardStates = _uiState.value.cardStates.toMutableList()
+                val cardStates = _uiState.value.cardStates.toMutableList()
                 
-                // First make card peek if it's not already
-                if (newCardStates[cardIndex] != CardState.PEEKING) {
-                    newCardStates[cardIndex] = CardState.PEEKING
+                // Check if card is already peeking from previous iteration
+                if (cardStates.getOrNull(cardIndex) == CardState.PEEKING) {
+                    // Card is already peeking - just scroll it up to expanded position
+                    cardStates[cardIndex] = CardState.EXPANDED
                     _uiState.value = _uiState.value.copy(
-                        cardStates = newCardStates,
-                        animationPhase = AnimationPhase.CARD_SLIDING_UP
+                        cardStates = cardStates,
+                        animationPhase = AnimationPhase.CARD_EXPANDED
                     )
-                    delay(300) // Brief peek moment
+                } else {
+                    // Card slides in from bottom and expands
+                    cardStates[cardIndex] = CardState.EXPANDED
+                    _uiState.value = _uiState.value.copy(
+                        cardStates = cardStates,
+                        animationPhase = AnimationPhase.CARD_EXPANDED
+                    )
                 }
                 
-                // Now expand the card
-                newCardStates[cardIndex] = CardState.EXPANDED
-                _uiState.value = _uiState.value.copy(
-                    cardStates = newCardStates,
-                    animationPhase = AnimationPhase.CARD_EXPANDED
-                )
-                
-                // Phase 2: Card stays expanded for 1400ms
+                // Wait (card stays expanded)
                 delay(1400)
                 
-                // If not the last card, collapse current card and show next card peeking
                 if (cardIndex < cardCount - 1) {
-                    // Phase 3: Current card collapses
-                    _uiState.value = _uiState.value.copy(
-                        animationPhase = AnimationPhase.CARD_COLLAPSING
-                    )
+                    // Not the last card - collapse current + peek next simultaneously
+                    _uiState.value = _uiState.value.copy(animationPhase = AnimationPhase.CARD_COLLAPSING)
                     
-                    // Collapse current card and show next card peeking
-                    newCardStates[cardIndex] = CardState.COLLAPSED
-                    if (cardIndex + 1 < cardCount) {
-                        newCardStates[cardIndex + 1] = CardState.PEEKING
-                    }
+                    // Collapse current card AND peek next card simultaneously  
+                    cardStates[cardIndex] = CardState.COLLAPSED
+                    cardStates[cardIndex + 1] = CardState.PEEKING // Next card peeks at 40%
+                    _uiState.value = _uiState.value.copy(cardStates = cardStates)
                     
-                    _uiState.value = _uiState.value.copy(cardStates = newCardStates)
-                    
-                    // Wait 800ms before next card slides up fully
+                    // Wait 800ms for collapse + peek animation
                     delay(800)
                 } else {
-                    // Last card - show button after 1400ms
-                    delay(1400)
+                    // Last card - stays expanded, enable user interaction
                     _uiState.value = _uiState.value.copy(
                         animationPhase = AnimationPhase.SEQUENCE_COMPLETE,
                         showButton = true,
@@ -184,17 +179,19 @@ class OnboardingViewModel @Inject constructor(
     fun onCardClick(cardIndex: Int) {
         if (!_uiState.value.isUserInteractionEnabled) return
         
+        val educationData = _uiState.value.educationData ?: return
         val newCardStates = _uiState.value.cardStates.toMutableList()
+        
+        // Expand clicked card, collapse all others (maintaining order)
         newCardStates.forEachIndexed { index, _ ->
             newCardStates[index] = if (index == cardIndex) CardState.EXPANDED else CardState.COLLAPSED
         }
         
-        val educationData = _uiState.value.educationData ?: return
-        
         _uiState.value = _uiState.value.copy(
             cardStates = newCardStates,
             currentCardIndex = cardIndex,
-            currentBackgroundColor = parseColor(educationData.educationCardList[cardIndex].backgroundColor)
+            currentBackgroundColor = parseColor(educationData.educationCardList[cardIndex].backgroundColor),
+            animationPhase = AnimationPhase.CARD_EXPANDED
         )
     }
     
@@ -219,6 +216,7 @@ class OnboardingViewModel @Inject constructor(
             startCardAnimationSequence()
         }
     }
+
     
     override fun onCleared() {
         super.onCleared()

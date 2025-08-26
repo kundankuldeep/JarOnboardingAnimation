@@ -34,6 +34,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.CachePolicy
+import com.app.jaronboardinganimation.R
 import com.app.jaronboardinganimation.data.model.onboarding.EducationCard
 import com.app.jaronboardinganimation.ui.theme.JarOnboardingAnimationTheme
 
@@ -77,11 +79,17 @@ fun ExpandedCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Image at top
+                // Image at top with optimized loading
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(educationCard.image)
                         .crossfade(true)
+                        .placeholder(R.drawable.ic_image_placeholder)
+                        .error(R.drawable.ic_image_error)
+                        .fallback(R.drawable.ic_image_placeholder)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .allowHardware(true)
                         .build(),
                     contentDescription = educationCard.expandStateText,
                     modifier = Modifier
@@ -147,11 +155,17 @@ fun CollapsedCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Image (32x36dp)
+                // Image (32x36dp) with optimized loading
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(educationCard.image)
                         .crossfade(true)
+                        .placeholder(R.drawable.ic_image_placeholder)
+                        .error(R.drawable.ic_image_error)
+                        .fallback(R.drawable.ic_image_placeholder)
+                        .memoryCachePolicy(CachePolicy.ENABLED)
+                        .diskCachePolicy(CachePolicy.ENABLED)
+                        .allowHardware(true)
                         .build(),
                     contentDescription = educationCard.collapsedStateText,
                     modifier = Modifier

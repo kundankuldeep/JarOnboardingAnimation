@@ -40,15 +40,7 @@ fun DashboardScreen(
                     )
                 },
                 navigationIcon = {
-                    // As this is the first screen of onboarding, no back button is needed,
-                    // we can implement here if there is special use case for back button
-                    IconButton(onClick = { /* TODO */ }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = Color.White
-                        )
-                    }
+                    // No back navigation needed for dashboard
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
