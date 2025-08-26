@@ -88,6 +88,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
+    // Coil (Image Loading)
+    implementation(libs.coil.compose)
+
+    // Lottie (Animations)
+    implementation(libs.lottie.compose)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

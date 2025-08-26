@@ -1,6 +1,6 @@
 package com.app.jaronboardinganimation.di
 
-import com.app.jaronboardinganimation.data.api.ApiService
+import com.app.jaronboardinganimation.data.api.OnboardingApiService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -12,7 +12,16 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Qualifier
 import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class JsonPlaceholderRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class OnboardingRetrofit
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -49,7 +58,8 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideRetrofit(
+    @JsonPlaceholderRetrofit
+    fun provideJsonPlaceholderRetrofit(
         okHttpClient: OkHttpClient,
         gson: Gson
     ): Retrofit {
@@ -62,7 +72,21 @@ object NetworkModule {
     
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): ApiService {
-        return retrofit.create(ApiService::class.java)
+    @OnboardingRetrofit
+    fun provideOnboardingRetrofit(
+        okHttpClient: OkHttpClient,
+        gson: Gson
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://myjar.app/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+    }
+    
+    @Provides
+    @Singleton
+    fun provideOnboardingApiService(@OnboardingRetrofit retrofit: Retrofit): OnboardingApiService {
+        return retrofit.create(OnboardingApiService::class.java)
     }
 }
